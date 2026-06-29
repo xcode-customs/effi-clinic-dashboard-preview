@@ -1,0 +1,645 @@
+<!doctype html>
+<html lang="ru" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Effi Clinic — дашборд воронки Telegram, Этап 1</title>
+<style>
+:root {
+  color-scheme: light;
+  --bg:#f6f7fb;
+  --panel:#ffffff;
+  --panel2:#f9fafb;
+  --ink:#111827;
+  --muted:#667085;
+  --muted-strong:#475467;
+  --line:#e5e7eb;
+  --soft-line:#eef2f7;
+  --accent:#2f80ed;
+  --accent2:#5b6ee1;
+  --accent-soft:#eef2ff;
+  --accent-ink:#3730a3;
+  --nav:#101828;
+  --nav-ink:#e5e7eb;
+  --nav-muted:#cbd5e1;
+  --hero1:#ffffff;
+  --hero2:#eff6ff;
+  --card-shadow:0 12px 30px rgba(16,24,40,.045);
+  --hero-shadow:0 18px 40px rgba(16,24,40,.06);
+  --track:#eef2f7;
+  --cell:#f2f4f7;
+  --cell-fill:#dbeafe;
+  --seg-ink:#111827;
+  --notread:#c7d2fe;
+  --readnoreply:#93c5fd;
+  --replynobook:#fbbf24;
+  --booking:#34d399;
+  --unclear:#d1d5db;
+  --warn:#f97316;
+  --warn-bg:#fff7ed;
+  --warn-border:#fed7aa;
+  --warn-ink:#7c2d12;
+  --callout-bg:#eff6ff;
+  --callout-ink:#1e3a8a;
+  --potential-bg:#ecfeff;
+  --potential-border:#67e8f9;
+  --potential-ink:#155e75;
+}
+html[data-theme="dark"] {
+  color-scheme: dark;
+  --bg:#0b1220;
+  --panel:#111827;
+  --panel2:#172033;
+  --ink:#f8fafc;
+  --muted:#a7b0c0;
+  --muted-strong:#cbd5e1;
+  --line:#273348;
+  --soft-line:#1f2937;
+  --accent:#60a5fa;
+  --accent2:#a78bfa;
+  --accent-soft:#1d2b4f;
+  --accent-ink:#dbeafe;
+  --nav:#020617;
+  --nav-ink:#e2e8f0;
+  --nav-muted:#94a3b8;
+  --hero1:#111827;
+  --hero2:#172554;
+  --card-shadow:0 16px 36px rgba(0,0,0,.32);
+  --hero-shadow:0 20px 50px rgba(0,0,0,.35);
+  --track:#1f2937;
+  --cell:#1f2937;
+  --cell-fill:#25406b;
+  --seg-ink:#08111f;
+  --notread:#818cf8;
+  --readnoreply:#60a5fa;
+  --replynobook:#f59e0b;
+  --booking:#10b981;
+  --unclear:#64748b;
+  --warn:#fb923c;
+  --warn-bg:#451a03;
+  --warn-border:#9a3412;
+  --warn-ink:#fed7aa;
+  --callout-bg:#14213d;
+  --callout-ink:#bfdbfe;
+  --potential-bg:#0f3440;
+  --potential-border:#0891b2;
+  --potential-ink:#cffafe;
+}
+* { box-sizing:border-box; }
+html { scroll-behavior:smooth; }
+body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif; color:var(--ink); background:var(--bg); overflow-x:hidden; }
+a { color:inherit; }
+.layout { display:grid; grid-template-columns:280px minmax(0,1fr); min-height:100vh; width:100%; }
+.sidebar { position:sticky; top:0; height:100vh; padding:28px 20px; background:var(--nav); color:var(--nav-ink); overflow:auto; }
+.brand { font-size:18px; font-weight:750; line-height:1.2; margin-bottom:8px; }
+.brand-sub { color:var(--nav-muted); font-size:12px; line-height:1.45; margin-bottom:18px; }
+.theme-toggle { width:100%; border:1px solid rgba(255,255,255,.18); background:rgba(255,255,255,.08); color:#fff; border-radius:12px; padding:10px 12px; cursor:pointer; font-weight:750; margin:0 0 22px; text-align:left; }
+.theme-toggle:hover { background:rgba(255,255,255,.14); }
+.nav { display:flex; flex-direction:column; gap:6px; }
+.nav a { text-decoration:none; padding:9px 10px; border-radius:10px; color:var(--nav-ink); font-size:13px; }
+.nav a:hover { background:rgba(255,255,255,.09); }
+.nav-small { margin-top:22px; padding-top:18px; border-top:1px solid rgba(255,255,255,.18); color:var(--nav-muted); font-size:12px; line-height:1.55; }
+.main { padding:34px 38px 70px; max-width:1320px; min-width:0; }
+.hero { background:linear-gradient(135deg,var(--hero1) 0%,var(--hero2) 100%); border:1px solid var(--line); border-radius:24px; padding:34px; box-shadow:var(--hero-shadow); }
+.eyebrow { font-size:12px; text-transform:uppercase; letter-spacing:.12em; color:var(--accent2); font-weight:750; margin-bottom:10px; }
+h1 { margin:0 0 12px; font-size:38px; line-height:1.08; letter-spacing:-.04em; }
+.lead { max-width:950px; color:var(--muted-strong); font-size:17px; line-height:1.6; margin:0; }
+.caveats { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin-top:22px; }
+.caveat { background:var(--warn-bg); border:1px solid var(--warn-border); border-radius:16px; padding:16px; font-size:14px; line-height:1.45; color:var(--warn-ink); }
+.caveat strong { display:block; color:var(--warn-ink); margin-bottom:4px; }
+section { margin-top:30px; scroll-margin-top:24px; }
+.panel { background:var(--panel); border:1px solid var(--line); border-radius:22px; padding:24px; box-shadow:var(--card-shadow); min-width:0; }
+.panel + .panel { margin-top:18px; }
+.section-title { display:flex; align-items:flex-start; justify-content:space-between; gap:18px; margin-bottom:18px; }
+h2 { margin:0; font-size:24px; letter-spacing:-.025em; }
+h3 { margin:0 0 12px; font-size:17px; }
+.section-title p, .panel-note { margin:6px 0 0; color:var(--muted); font-size:14px; line-height:1.55; }
+.denom { display:inline-flex; align-items:center; gap:6px; padding:7px 10px; border-radius:999px; background:var(--accent-soft); color:var(--accent-ink); font-weight:700; font-size:12px; white-space:nowrap; }
+.view-badge { display:inline-flex; align-items:center; padding:5px 9px; border-radius:999px; background:var(--panel2); color:var(--muted-strong); font-weight:750; font-size:11px; text-transform:uppercase; letter-spacing:.06em; }
+.kpi-grid { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; margin-top:22px; }
+.kpi { background:var(--panel); border:1px solid var(--line); border-radius:18px; padding:17px; min-height:124px; }
+.kpi-top { min-height:20px; }
+.kpi-badge { display:inline-block; font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted-strong); background:var(--panel2); padding:4px 7px; border-radius:999px; font-weight:800; }
+.kpi-value { font-size:31px; font-weight:820; letter-spacing:-.04em; margin-top:4px; }
+.kpi-label { color:var(--ink); font-weight:700; margin-top:4px; }
+.kpi-sub { color:var(--muted); font-size:12px; line-height:1.35; margin-top:5px; }
+.grid-2 { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:18px; }
+.grid-3 { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:18px; }
+.grid-4 { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:14px; }
+.progress-row { margin:0 0 15px; }
+.progress-meta { display:flex; justify-content:space-between; gap:12px; font-size:14px; margin-bottom:7px; }
+.progress-meta span { color:var(--muted-strong); white-space:nowrap; }
+.progress-track { height:20px; border-radius:999px; background:var(--track); overflow:hidden; border:1px solid var(--line); }
+.progress-fill { height:100%; border-radius:999px; background:linear-gradient(90deg,var(--accent),var(--accent2)); }
+.progress-sub { color:var(--muted); font-size:12px; margin-top:5px; }
+.legend { display:flex; flex-wrap:wrap; gap:10px 14px; margin:12px 0 0; color:var(--muted-strong); font-size:12px; }
+.legend span { display:inline-flex; align-items:center; gap:6px; }
+.legend i { width:12px; height:12px; border-radius:4px; display:inline-block; }
+.notread, .legend .notread { background:var(--notread); }
+.readnoreply, .legend .readnoreply { background:var(--readnoreply); }
+.replynobook, .legend .replynobook { background:var(--replynobook); }
+.booking, .legend .booking { background:var(--booking); }
+.unclear, .legend .unclear { background:var(--unclear); }
+.stacked { display:flex; width:100%; height:30px; border-radius:999px; overflow:hidden; background:var(--track); border:1px solid var(--line); }
+.seg { display:flex; align-items:center; justify-content:center; min-width:1px; color:var(--seg-ink); font-size:11px; font-weight:800; white-space:nowrap; overflow:hidden; }
+.seg span { padding:0 6px; overflow:hidden; text-overflow:ellipsis; }
+.stack-row { display:grid; grid-template-columns:270px minmax(0,1fr); gap:14px; align-items:center; padding:12px 0; border-top:1px solid var(--soft-line); }
+.stack-row:first-child { border-top:0; }
+.stack-label strong { display:block; font-size:14px; }
+.stack-label span { display:block; color:var(--muted); font-size:12px; margin-top:3px; }
+.stack-note { color:var(--muted); font-size:12px; margin-top:6px; }
+.table-wrap { overflow:auto; max-width:100%; }
+.metric-table { width:100%; border-collapse:collapse; font-size:13px; min-width:680px; }
+.metric-table.compact { min-width:520px; }
+.metric-table th { text-align:left; color:var(--muted-strong); font-size:11px; text-transform:uppercase; letter-spacing:.06em; padding:11px 10px; border-bottom:1px solid var(--line); background:var(--panel2); }
+.metric-table td { padding:12px 10px; border-bottom:1px solid var(--soft-line); vertical-align:middle; }
+.metric-table tr:last-child td { border-bottom:0; }
+.cell-bar { position:relative; height:28px; background:var(--cell); border-radius:999px; overflow:hidden; min-width:170px; }
+.cell-bar span { position:absolute; left:0; top:0; bottom:0; background:var(--cell-fill); border-radius:999px; }
+.cell-bar b { position:absolute; left:10px; top:6px; font-size:12px; color:var(--ink); }
+.cell-bar em { position:absolute; right:10px; top:7px; color:var(--muted-strong); font-size:11px; font-style:normal; }
+.small-only { display:inline-flex; padding:4px 8px; border-radius:999px; background:var(--warn-bg); color:var(--warn-ink); font-size:11px; font-weight:750; white-space:nowrap; }
+.callout { border-left:4px solid var(--accent); padding:14px 16px; background:var(--callout-bg); border-radius:12px; color:var(--callout-ink); font-size:14px; line-height:1.55; }
+.warning { border-left-color:var(--warn); background:var(--warn-bg); color:var(--warn-ink); }
+.potential { background:var(--potential-bg); border:1px solid var(--potential-border); color:var(--potential-ink); }
+.big-number { font-size:42px; font-weight:850; letter-spacing:-.05em; margin:4px 0; }
+.duo { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:14px; }
+.duo-card { border:1px solid var(--line); border-radius:18px; padding:18px; background:var(--panel); min-width:0; }
+.duo-card .label { color:var(--muted-strong); font-size:13px; }
+.duo-card .value { font-size:30px; font-weight:820; letter-spacing:-.04em; margin-top:4px; }
+.calc-box { border:1px solid var(--potential-border); border-radius:18px; padding:18px; background:var(--potential-bg); color:var(--potential-ink); }
+.calc-box .formula { color:var(--potential-ink); font-size:12px; line-height:1.5; margin-top:8px; }
+.roadmap { display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); gap:12px; }
+.roadmap-item { display:grid; grid-template-columns:44px minmax(0,1fr); gap:12px; align-items:start; border:1px solid var(--line); border-radius:16px; padding:14px; background:var(--panel); }
+.roadmap-priority { width:34px; height:34px; border-radius:50%; background:var(--accent-soft); color:var(--accent-ink); display:flex; align-items:center; justify-content:center; font-weight:850; }
+.roadmap-item p { margin:5px 0 0; color:var(--muted); line-height:1.4; font-size:12px; }
+.source-note { margin-top:20px; color:var(--muted); font-size:12px; line-height:1.6; }
+.footer { color:var(--muted); font-size:12px; margin-top:30px; padding:22px 0; border-top:1px solid var(--line); }
+@media (max-width: 1000px) {
+  .layout { grid-template-columns:1fr; }
+  .sidebar { position:relative; height:auto; }
+  .main { padding:24px 18px 50px; max-width:100%; }
+  .kpi-grid, .grid-2, .grid-3, .grid-4, .caveats, .roadmap, .duo { grid-template-columns:1fr; }
+  .stack-row { grid-template-columns:1fr; }
+  .section-title { flex-direction:column; }
+  .denom { white-space:normal; }
+}
+@media (max-width: 560px) {
+  .sidebar { padding:20px 16px; }
+  .main { padding:18px 12px 42px; }
+  .hero, .panel { padding:18px; border-radius:18px; }
+  h1 { font-size:30px; }
+  h2 { font-size:21px; }
+  .kpi-value, .duo-card .value { font-size:26px; }
+  .big-number { font-size:34px; }
+  .progress-meta { flex-direction:column; gap:3px; }
+  .stacked { height:28px; }
+  .seg span { font-size:10px; }
+  .metric-table { min-width:620px; }
+}
+@media print {
+  .sidebar { display:none; }
+  .layout { display:block; }
+  body { background:white; }
+  .main { padding:0; max-width:none; }
+  .panel, .hero, .kpi { box-shadow:none; break-inside:avoid; }
+  section { break-inside:avoid; }
+}
+</style>
+<script>
+(function() {
+  try {
+    var saved = localStorage.getItem('effi_dashboard_theme');
+    var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+    var theme = saved || (prefersDark ? 'dark' : 'light');
+    document.documentElement.setAttribute('data-theme', theme);
+  } catch (e) {}
+})();
+function toggleTheme() {
+  var root = document.documentElement;
+  var current = root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light';
+  var next = current === 'dark' ? 'light' : 'dark';
+  root.setAttribute('data-theme', next);
+  try { localStorage.setItem('effi_dashboard_theme', next); } catch (e) {}
+  var btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = next === 'dark' ? '☀️ Светлая тема' : '🌙 Темная тема';
+}
+document.addEventListener('DOMContentLoaded', function() {
+  var btn = document.getElementById('themeToggle');
+  if (btn) btn.textContent = document.documentElement.getAttribute('data-theme') === 'dark' ? '☀️ Светлая тема' : '🌙 Темная тема';
+});
+</script>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">Effi Clinic<br>Дашборд Этапа 1</div>
+    <div class="brand-sub">Клиентская версия · агрегация v1.1 · без исходных переписок, внутренних путей, идентификаторов и аудит-индекса.</div>
+    <button id="themeToggle" class="theme-toggle" type="button" onclick="toggleTheme()">🌙 Темная тема</button>
+    <nav class="nav" aria-label="Навигация по отчету">
+      <a href="#summary">1. Резюме</a>
+      <a href="#glossary">2. Знаменатели</a>
+      <a href="#funnel">3. Воронка касаний</a>
+      <a href="#client-view">4. Срез по клиентам</a>
+      <a href="#breaks">5. Где теряется объем</a>
+      <a href="#direct-offer">6. Прямое предложение записи</a>
+      <a href="#silence">7. Молчание и возврат</a>
+      <a href="#second-followup">8. Потенциал второй добивки</a>
+      <a href="#questions">9. Уточняющие вопросы</a>
+      <a href="#booking">10. Запись и высокий интерес</a>
+      <a href="#trend">11. Динамика по месяцам</a>
+      <a href="#pass2">12. План Этапа 2</a>
+    </nav>
+    <div class="nav-small">
+      Правило малых баз: n&lt;30 → показываем только количество.<br>
+      Запись: только подтвержденная запись, видимая в чате.
+    </div>
+  </aside>
+  <main class="main">
+    <div class="hero" id="summary">
+      <div class="eyebrow">Этап 1 · диагностика Telegram-воронки</div>
+      <h1>Что происходит в воронке переписок</h1>
+      <p class="lead">Дашборд показывает структуру касаний, ответов и записей, видимых в чате, отдельно на уровне касаний и на уровне клиентов. Это базовая диагностика перед Этапом 2: здесь нет причинных выводов, дерева скриптов и финальных рекомендаций по формулировкам.</p>
+      <div class="caveats">
+        <div class="caveat"><strong>Описательная аналитика, не причинность.</strong> Связи в сегментах показывают наблюдаемую ассоциацию, а не доказательство, что прямое предложение записи, цена, скидка или конкретный вопрос сами по себе повышают запись.</div>
+        <div class="caveat"><strong>Подтвержденная запись в чате.</strong> Запись считается только если она видимо подтверждена в Telegram-переписке. Записи вне Telegram и CRM не сверялись, поэтому это нижняя граница.</div>
+      </div>
+      <div class="kpi-grid">
+        <div class="kpi"><div class="kpi-top"><span class="kpi-badge">Срез по касаниям</span></div><div class="kpi-value">869</div><div class="kpi-label">Валидные клиентские касания</div><div class="kpi-sub">876 проверенных строк; 7 в техническом контуре проверки/исключения</div></div>
+        <div class="kpi"><div class="kpi-top"><span class="kpi-badge">Срез по касаниям</span></div><div class="kpi-value">833</div><div class="kpi-label">Доступные для контакта касания</div><div class="kpi-sub">95,9% от валидных касаний</div></div>
+        <div class="kpi"><div class="kpi-top"><span class="kpi-badge">Срез по касаниям</span></div><div class="kpi-value">398</div><div class="kpi-label">Наблюдаемые ответы клиента</div><div class="kpi-sub">47,8% от доступных для контакта касаний</div></div>
+        <div class="kpi"><div class="kpi-top"><span class="kpi-badge">Срез по касаниям</span></div><div class="kpi-value">57</div><div class="kpi-label">Подтвержденные записи в чате</div><div class="kpi-sub">14,3% от касаний с ответом</div></div>
+        <div class="kpi"><div class="kpi-top"><span class="kpi-badge">Срез по клиентам</span></div><div class="kpi-value">524</div><div class="kpi-label">Уникальные клиентские диалоги</div><div class="kpi-sub">170 клиентов с несколькими касаниями</div></div>
+        <div class="kpi"><div class="kpi-top"><span class="kpi-badge">Срез по клиентам</span></div><div class="kpi-value">290</div><div class="kpi-label">Клиенты с ответом</div><div class="kpi-sub">55,3% от уникальных клиентов</div></div>
+        <div class="kpi"><div class="kpi-top"><span class="kpi-badge">Срез по клиентам</span></div><div class="kpi-value">53</div><div class="kpi-label">Клиенты с подтвержденной записью</div><div class="kpi-sub">10,1% от уникальных клиентов</div></div>
+        <div class="kpi"><div class="kpi-top"><span class="kpi-badge">Вход для Этапа 2</span></div><div class="kpi-value">41</div><div class="kpi-label">Высокий интерес без подтвержденной записи</div><div class="kpi-sub">Есть прогресс в диалоге, но нет строгого подтверждения записи в чате</div></div>
+      </div>
+    </div>
+
+    <section id="glossary" class="panel">
+      <div class="section-title">
+        <div><h2>Словарь знаменателей</h2><p>Используется на всех графиках, чтобы не смешивать срез по касаниям и срез по клиентам.</p></div>
+        <span class="denom">База явно указана в каждом блоке</span>
+      </div>
+      <div class="table-wrap"><table class="metric-table"><thead><tr><th>Термин</th><th>n</th><th>Что означает</th></tr></thead><tbody>
+        <tr><td><strong>Проверенные строки разметки</strong></td><td>876</td><td>Все классифицированные касания. Используется только как техническая строка качества.</td></tr>
+        <tr><td><strong>Валидные клиентские касания</strong></td><td>869</td><td>Основная база для анализа на уровне касаний.</td></tr>
+        <tr><td><strong>Доступные для контакта касания</strong></td><td>833</td><td>Касания не в статусе «не прочитано / нет подтвержденного контакта» или с наблюдаемым ответом.</td></tr>
+        <tr><td><strong>Касания с ответом клиента</strong></td><td>398</td><td>Есть наблюдаемый ответ клиента после целевого касания.</td></tr>
+        <tr><td><strong>Подтвержденная запись в чате</strong></td><td>57</td><td>Запись видимо подтверждена в Telegram-переписке.</td></tr>
+        <tr><td><strong>Уникальные клиентские диалоги</strong></td><td>524</td><td>Срез по клиентам; отдельный знаменатель, не смешивается с касаниями.</td></tr>
+      </tbody></table></div>
+    </section>
+
+    <section id="funnel" class="grid-2">
+      <div class="panel">
+        <div class="section-title">
+          <div><span class="view-badge">Срез по касаниям</span><h2>Главная воронка</h2><p>Этапы показаны от базы валидных клиентских касаний.</p></div>
+          <span class="denom">Знаменатель: n=869 валидных касаний</span>
+        </div>
+        
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Валидные клиентские касания</strong><span>869 / 869 · 100,0%</span></div>
+        <div class="progress-track" role="img" aria-label="Валидные клиентские касания: 869 / 869 · 100,0%"><div class="progress-fill" style="width:100.00000%"></div></div>
+        <div class="progress-sub">База для всех графиков на уровне касаний</div>
+      </div>
+        
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Доступные для контакта касания</strong><span>833 / 869 · 95,9%</span></div>
+        <div class="progress-track" role="img" aria-label="Доступные для контакта касания: 833 / 869 · 95,9%"><div class="progress-fill" style="width:95.85731%"></div></div>
+        <div class="progress-sub">Не «не прочитано / нет подтвержденного контакта» или есть наблюдаемый ответ</div>
+      </div>
+        
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Наблюдаемые ответы клиента</strong><span>398 / 869 · 45,8%</span></div>
+        <div class="progress-track" role="img" aria-label="Наблюдаемые ответы клиента: 398 / 869 · 45,8%"><div class="progress-fill" style="width:45.79977%"></div></div>
+        <div class="progress-sub">Это 47,8% от доступных для контакта касаний</div>
+      </div>
+        
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Подтвержденные записи в чате</strong><span>57 / 869 · 6,6%</span></div>
+        <div class="progress-track" role="img" aria-label="Подтвержденные записи в чате: 57 / 869 · 6,6%"><div class="progress-fill" style="width:6.55926%"></div></div>
+        <div class="progress-sub">Это 14,3% от касаний с ответом</div>
+      </div>
+      </div>
+      <div class="panel">
+        <div class="section-title">
+          <div><span class="view-badge">Срез по касаниям</span><h2>Распределение исходов</h2><p>Что произошло после целевого касания.</p></div>
+          <span class="denom">Знаменатель: n=869</span>
+        </div>
+        <div class="stacked"><div class="seg notread" style="width:4.14269%" title="Не прочитано / нет подтвержденного контакта: 36 / 869 (4,1%)"><span>Не прочитано: 36</span></div><div class="seg readnoreply" style="width:50.05754%" title="Прочитано, ответа нет: 435 / 869 (50,1%)"><span>Прочитано, ответа нет: 50,1%</span></div><div class="seg replynobook" style="width:39.12543%" title="Ответил, записи нет: 340 / 869 (39,1%)"><span>Ответил, записи нет: 39,1%</span></div><div class="seg booking" style="width:6.55926%" title="Ответил + подтвержденная запись: 57 / 869 (6,6%)"><span>Запись: 57</span></div><div class="seg unclear" style="width:0.11507%" title="Неясно: 1 / 869 · только количество"><span>Неясно: 1</span></div></div>
+        <div class="legend"><span><i class="notread"></i>Не прочитано / нет подтвержденного контакта</span><span><i class="readnoreply"></i>Прочитано, ответа нет</span><span><i class="replynobook"></i>Ответил, записи нет</span><span><i class="booking"></i>Подтвержденная запись в чате</span><span><i class="unclear"></i>Неясно</span></div>
+        <div class="source-note">Ключевой объемный разрыв: 435 касаний в статусе «прочитано, ответа нет» = 50,1% от валидных касаний. Формулировка отчета: «нет наблюдаемого ответа», а не «клиент точно проигнорировал».</div>
+      </div>
+    </section>
+
+    <section id="client-view" class="panel">
+      <div class="section-title">
+        <div><span class="view-badge">Срез по клиентам</span><h2>Касания и клиенты — разные базы</h2><p>Срез по касаниям показывает эффективность отдельных исходящих касаний; срез по клиентам показывает бизнес-результат на уровне людей/диалогов.</p></div>
+        <span class="denom">Клиентский знаменатель: n=524</span>
+      </div>
+      <div class="grid-2">
+        <div>
+          <h3>Срез по касаниям</h3>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Валидные касания</strong><span>869 / 869 · 100,0%</span></div>
+        <div class="progress-track" role="img" aria-label="Валидные касания: 869 / 869 · 100,0%"><div class="progress-fill" style="width:100.00000%"></div></div>
+        <div class="progress-sub">n=869</div>
+      </div>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Касания с подтвержденной записью</strong><span>57 / 869 · 6,6%</span></div>
+        <div class="progress-track" role="img" aria-label="Касания с подтвержденной записью: 57 / 869 · 6,6%"><div class="progress-fill" style="width:6.55926%"></div></div>
+        <div class="progress-sub">6,6% от валидных касаний</div>
+      </div>
+        </div>
+        <div>
+          <h3>Срез по клиентам</h3>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Уникальные клиентские диалоги</strong><span>524 / 524 · 100,0%</span></div>
+        <div class="progress-track" role="img" aria-label="Уникальные клиентские диалоги: 524 / 524 · 100,0%"><div class="progress-fill" style="width:100.00000%"></div></div>
+        <div class="progress-sub">n=524</div>
+      </div>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Доступные для контакта клиенты</strong><span>502 / 524 · 95,8%</span></div>
+        <div class="progress-track" role="img" aria-label="Доступные для контакта клиенты: 502 / 524 · 95,8%"><div class="progress-fill" style="width:95.80153%"></div></div>
+        <div class="progress-sub">95,8% от уникальных клиентов</div>
+      </div>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Клиенты с ответом</strong><span>290 / 524 · 55,3%</span></div>
+        <div class="progress-track" role="img" aria-label="Клиенты с ответом: 290 / 524 · 55,3%"><div class="progress-fill" style="width:55.34351%"></div></div>
+        <div class="progress-sub">55,3% от уникальных клиентов</div>
+      </div>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Клиенты с подтвержденной записью</strong><span>53 / 524 · 10,1%</span></div>
+        <div class="progress-track" role="img" aria-label="Клиенты с подтвержденной записью: 53 / 524 · 10,1%"><div class="progress-fill" style="width:10.11450%"></div></div>
+        <div class="progress-sub">10,1% от уникальных клиентов</div>
+      </div>
+        </div>
+      </div>
+      <div class="callout">6,6% на уровне касаний и 10,1% на уровне клиентов нельзя сравнивать как один и тот же процент: это разные знаменатели и разные управленческие вопросы.</div>
+    </section>
+
+    <section id="breaks" class="panel">
+      <div class="section-title">
+        <div><span class="view-badge">Срез по касаниям</span><h2>Где воронка теряет объем по контексту касания</h2><p>Исходы внутри каждого контекстного сегмента. Строки с n&lt;30 показаны только количеством.</p></div>
+        <span class="denom">Знаменатель: n конкретной строки</span>
+      </div>
+      
+      <div class="stack-row">
+        <div class="stack-label"><strong>Первое холодное касание</strong><span>n=357 · знаменатель: строка n</span></div>
+        <div class="stacked"><div class="seg notread" style="width:4.48179%" title="Не прочитано: 16 / 357 (4,5%)"><span>Не прочитано: 16</span></div><div class="seg readnoreply" style="width:51.82073%" title="Прочитано, ответа нет: 185 / 357 (51,8%)"><span>Прочитано, ответа нет: 51,8%</span></div><div class="seg replynobook" style="width:35.57423%" title="Ответил, записи нет: 127 / 357 (35,6%)"><span>Ответил, записи нет: 35,6%</span></div><div class="seg booking" style="width:8.12325%" title="Запись: 29 / 357 (8,1%)"><span>Запись: 8,1%</span></div><div class="seg unclear" style="width:0.00000%" title="Неясно: 0 / 357 (0,0%)"><span>Неясно: 0</span></div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-label"><strong>Возврат к клиенту с историей</strong><span>n=328 · знаменатель: строка n</span></div>
+        <div class="stacked"><div class="seg notread" style="width:2.13415%" title="Не прочитано: 7 / 328 (2,1%)"><span>Не прочитано: 7</span></div><div class="seg readnoreply" style="width:44.51220%" title="Прочитано, ответа нет: 146 / 328 (44,5%)"><span>Прочитано, ответа нет: 44,5%</span></div><div class="seg replynobook" style="width:46.64634%" title="Ответил, записи нет: 153 / 328 (46,6%)"><span>Ответил, записи нет: 46,6%</span></div><div class="seg booking" style="width:6.70732%" title="Запись: 22 / 328 (6,7%)"><span>Запись: 22</span></div><div class="seg unclear" style="width:0.00000%" title="Неясно: 0 / 328 (0,0%)"><span>Неясно: 0</span></div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-label"><strong>Повторное касание без прошлого ответа</strong><span>n=166 · знаменатель: строка n</span></div>
+        <div class="stacked"><div class="seg notread" style="width:7.83133%" title="Не прочитано: 13 / 166 (7,8%)"><span>Не прочитано: 7,8%</span></div><div class="seg readnoreply" style="width:60.84337%" title="Прочитано, ответа нет: 101 / 166 (60,8%)"><span>Прочитано, ответа нет: 60,8%</span></div><div class="seg replynobook" style="width:28.91566%" title="Ответил, записи нет: 48 / 166 (28,9%)"><span>Ответил, записи нет: 28,9%</span></div><div class="seg booking" style="width:2.40964%" title="Запись: 4 / 166 (2,4%)"><span>Запись: 4</span></div><div class="seg unclear" style="width:0.00000%" title="Неясно: 0 / 166 (0,0%)"><span>Неясно: 0</span></div></div>
+      </div>
+      <div class="stack-row">
+        <div class="stack-label"><strong>Несовпадение контекста / ответ не туда</strong><span>n=18 · только количество</span></div>
+        <div class="stacked"><div class="seg notread" style="width:0.00000%" title="Не прочитано: 0 / 18 · только количество"><span>Не прочитано: 0</span></div><div class="seg readnoreply" style="width:16.66667%" title="Прочитано, ответа нет: 3 / 18 · только количество"><span>Прочитано, ответа нет: 3</span></div><div class="seg replynobook" style="width:66.66667%" title="Ответил, записи нет: 12 / 18 · только количество"><span>Ответил, записи нет: 12</span></div><div class="seg booking" style="width:11.11111%" title="Запись: 2 / 18 · только количество"><span>Запись: 2</span></div><div class="seg unclear" style="width:5.55556%" title="Неясно: 1 / 18 · только количество"><span>Неясно: 1</span></div></div>
+      </div>
+      <div class="legend"><span><i class="notread"></i>Не прочитано / нет подтвержденного контакта</span><span><i class="readnoreply"></i>Прочитано, ответа нет</span><span><i class="replynobook"></i>Ответил, записи нет</span><span><i class="booking"></i>Подтвержденная запись в чате</span><span><i class="unclear"></i>Неясно</span></div>
+      <div class="source-note">Описательный сигнал: повторные касания без прошлого ответа выглядят слабее по наблюдаемому ответу и записи, чем первые касания и возвраты к клиентам с историей. Этап 2 должен прочитать эти случаи отдельно до выводов по скриптам.</div>
+    </section>
+
+    <section id="direct-offer" class="grid-2">
+      <div class="panel">
+        <div class="section-title">
+          <div><span class="view-badge">Срез по касаниям</span><h2>Прямое предложение записи</h2><p>Сравнение касаний, где менеджер сразу предлагал записаться, и касаний без такого предложения. База указана в каждой ячейке.</p></div>
+          <span class="denom">База: n=869</span>
+        </div>
+        <div class="table-wrap"><table class="metric-table"><thead><tr><th>Сегмент</th><th>Касания</th><th>Ответ среди доступных</th><th>Запись среди ответивших</th><th>Первый ответ — вопрос</th></tr></thead><tbody>
+          <tr><td>Прямое предложение записи есть</td><td>123</td><td><div class="cell-bar" role="img" aria-label="54 из 120: 45,0%"><span style="width:45.0000%"></span><b>45,0%</b><em>54/120</em></div></td><td><div class="cell-bar" role="img" aria-label="11 из 54: 20,4%"><span style="width:20.3704%"></span><b>20,4%</b><em>11/54</em></div></td><td><div class="cell-bar" role="img" aria-label="23 из 54: 42,6%"><span style="width:42.5926%"></span><b>42,6%</b><em>23/54</em></div></td></tr>
+          <tr><td>Прямого предложения записи нет</td><td>746</td><td><div class="cell-bar" role="img" aria-label="344 из 713: 48,2%"><span style="width:48.2468%"></span><b>48,2%</b><em>344/713</em></div></td><td><div class="cell-bar" role="img" aria-label="46 из 344: 13,4%"><span style="width:13.3721%"></span><b>13,4%</b><em>46/344</em></div></td><td><div class="cell-bar" role="img" aria-label="100 из 344: 29,1%"><span style="width:29.0698%"></span><b>29,1%</b><em>100/344</em></div></td></tr>
+        </tbody></table></div>
+        <div class="callout warning">Это описательная ассоциация. Прямое предложение записи может чаще использоваться в более теплых или более подходящих ситуациях, поэтому здесь нет причинного вывода.</div>
+      </div>
+      <div class="panel">
+        <div class="section-title">
+          <div><span class="view-badge">Срез по касаниям</span><h2>Тип первого ответа клиента</h2><p>Распределение среди касаний с наблюдаемым ответом. Малые типы ответа свернуты в одну строку.</p></div>
+          <span class="denom">Знаменатель: n=398 ответов</span>
+        </div>
+        <div class="table-wrap"><table class="metric-table compact"><thead><tr><th>Тип первого ответа</th><th>Количество</th><th>Доля / правило</th></tr></thead><tbody>
+          <tr><td>Содержательный ответ</td><td>194</td><td>48,7%</td></tr>
+          <tr><td>Вопрос о цене</td><td>60</td><td>15,1%</td></tr>
+          <tr><td>Другое</td><td>42</td><td>10,6%</td></tr>
+          <tr><td>Только «спасибо»</td><td>32</td><td>8,0%</td></tr>
+          <tr><td>Малые типы ответа</td><td>70</td><td><span class="small-only">только количество</span></td></tr>
+        </tbody></table></div>
+        <div class="duo" style="margin-top:14px;">
+          <div class="duo-card"><div class="label">При прямом предложении записи: первый ответ — вопрос</div><div class="value">42,6%</div><div class="panel-note">23/54 среди ответивших касаний с прямым предложением записи</div></div>
+          <div class="duo-card"><div class="label">Без прямого предложения записи: первый ответ — вопрос</div><div class="value">29,1%</div><div class="panel-note">100/344 среди ответивших касаний без прямого предложения записи</div></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="silence" class="panel">
+      <div class="section-title">
+        <div><span class="view-badge">Срез по касаниям</span><h2>Молчание и возврат после паузы</h2><p>«Прочитано, ответа нет» — самый крупный видимый разрыв. Разбивка по триггерам показана только количеством.</p></div>
+        <span class="denom">Чистая база возврата: n=470</span>
+      </div>
+      <div class="grid-3">
+        <div class="duo-card"><div class="label">Касания «прочитано, ответа нет»</div><div class="value">435</div><div class="panel-note">50,1% от валидных касаний</div></div>
+        <div class="duo-card"><div class="label">Вернулись после паузы</div><div class="value">35</div><div class="panel-note">35/470 = 7,4%</div></div>
+        <div class="duo-card"><div class="label">Остались без наблюдаемого ответа</div><div class="value">435</div><div class="panel-note">Количество в логике чистой базы</div></div>
+      </div>
+      <div style="margin-top:18px;">
+        <h3>Типы сообщений, после которых клиент вернулся</h3>
+        <div class="table-wrap"><table class="metric-table compact"><thead><tr><th>Тип сообщения</th><th>Вернувшиеся касания</th><th>Правило показа</th></tr></thead><tbody>
+          <tr><td>«Дошло ли?»</td><td>11</td><td><span class="small-only">только количество</span></td></tr>
+          <tr><td>Уточняющий вопрос</td><td>10</td><td><span class="small-only">только количество</span></td></tr>
+          <tr><td>Неясно</td><td>5</td><td><span class="small-only">только количество</span></td></tr>
+          <tr><td>Новое предложение / услуга</td><td>4</td><td><span class="small-only">только количество</span></td></tr>
+          <tr><td>Другое</td><td>2</td><td><span class="small-only">только количество</span></td></tr>
+          <tr><td>Цена</td><td>2</td><td><span class="small-only">только количество</span></td></tr>
+          <tr><td>Предложение консультации</td><td>1</td><td><span class="small-only">только количество</span></td></tr>
+        </tbody></table></div>
+      </div>
+      <div class="source-note">Все строки по типам сообщений меньше n=30, поэтому в клиентском отчете это только количество. Этап 2 должен прочитать реальные формулировки до рекомендаций по добивкам.</div>
+    </section>
+
+    <section id="second-followup" class="panel potential">
+      <div class="section-title">
+        <div><span class="view-badge">Срез по клиентам</span><h2>Оценка упущенного потенциала второй добивки</h2><p>Это оценка по фактической конверсии второго касания в этой базе, не гарантия результата.</p></div>
+        <span class="denom">База по клиентам: n=166 клиентов</span>
+      </div>
+      <div class="grid-3">
+        <div class="calc-box"><div class="label">Клиенты без второй добивки</div><div class="value">166</div><div class="formula">Прочитали первое касание, не ответили и больше не получили повторной добивки.</div></div>
+        <div class="calc-box"><div class="label">Ответ на второе касание</div><div class="value">37,6%</div><div class="formula">35 ответов из 93 вторых касаний после первого молчания.</div></div>
+        <div class="calc-box"><div class="label">Запись от второго касания</div><div class="value">3,2%</div><div class="formula">3 подтвержденные записи в чате из 93 вторых касаний.</div></div>
+      </div>
+      <div class="grid-2" style="margin-top:18px;">
+        <div class="duo-card"><div class="label">Ориентировочно дополнительные ответы</div><div class="value">+62</div><div class="panel-note">166 × 37,6% ≈ 62 ответа</div></div>
+        <div class="duo-card"><div class="label">Ориентировочно дополнительные подтвержденные записи в чате</div><div class="value">+5</div><div class="panel-note">166 × 3,2% ≈ 5 записей</div></div>
+      </div>
+      <div class="callout warning" style="margin-top:18px;">Важно: это оценка потенциала, а не обещание результата. Она рассчитана по фактической конверсии второго касания в этой базе. Число 246 здесь не используется: 246 — это последние эпизоды «прочитано, ответа нет», а не клиенты. Для оценки на уровне клиентов упущенной второй добивки используется база 166 клиентов.</div>
+    </section>
+
+    <section id="questions" class="grid-2">
+      <div class="panel">
+        <div class="section-title">
+          <div><span class="view-badge">Срез по касаниям</span><h2>Уточняющие вопросы: наличие</h2><p>Только верхнеуровневое выполнение правила; без причинной интерпретации.</p></div>
+          <span class="denom">Знаменатель: n=869 валидных касаний</span>
+        </div>
+        
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Менеджер задал уточняющий вопрос</strong><span>745 / 869 · 85,7%</span></div>
+        <div class="progress-track" role="img" aria-label="Менеджер задал уточняющий вопрос: 745 / 869 · 85,7%"><div class="progress-fill" style="width:85.73072%"></div></div>
+        <div class="progress-sub">85,7% от валидных касаний</div>
+      </div>
+        
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Уточняющего вопроса нет</strong><span>124 / 869 · 14,3%</span></div>
+        <div class="progress-track" role="img" aria-label="Уточняющего вопроса нет: 124 / 869 · 14,3%"><div class="progress-fill" style="width:14.26928%"></div></div>
+        <div class="progress-sub">14,3% от валидных касаний</div>
+      </div>
+        <div class="duo-card" style="margin-top:16px;"><div class="label">Выполнение правила на уровне сообщений менеджера</div><div class="value">79,4%</div><div class="panel-note">987/1 243 учитываемых сообщений менеджера содержали релевантный вопрос</div></div>
+      </div>
+      <div class="panel">
+        <div class="section-title">
+          <div><span class="view-badge">Срез по касаниям</span><h2>Категории выполнения правила</h2><p>Учитываются только учитываемые сообщения менеджера. Малые базы остаются только количеством.</p></div>
+          <span class="denom">Знаменатель: n=869</span>
+        </div>
+        <div class="table-wrap"><table class="metric-table"><thead><tr><th>Категория</th><th>Касания</th><th>Доля / правило</th><th>Учитываемые сообщения</th><th>С релевантным вопросом</th></tr></thead><tbody>
+          <tr><td>Во всех учитываемые сообщениях</td><td>670</td><td>77,1%</td><td>875</td><td>875</td></tr>
+          <tr><td>В части учитываемых сообщений</td><td>75</td><td>8,6%</td><td>216</td><td>112</td></tr>
+          <tr><td>Нет уточняющего вопроса</td><td>123</td><td>14,2%</td><td>150</td><td>0</td></tr>
+          <tr><td>Неясно</td><td>1</td><td><span class="small-only">только количество</span></td><td>2</td><td>0</td></tr>
+        </tbody></table></div>
+        <div class="source-note">Показатели вроде «вопрос связан с записью» намеренно не вынесены в главный вывод: они близки к метке результата и могут быть тавтологичны.</div>
+      </div>
+    </section>
+
+    <section id="booking" class="panel">
+      <div class="section-title">
+        <div><span class="view-badge">Срез по касаниям</span><h2>Запись и высокий интерес без подтверждения</h2><p>Лестница прогресса от наблюдаемых ответов до подтвержденной записи и высокого интереса без строгого подтверждения.</p></div>
+        <span class="denom">Знаменатель по ответам: n=398</span>
+      </div>
+      <div class="grid-2">
+        <div>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Наблюдаемые ответы</strong><span>398 / 398 · 100,0%</span></div>
+        <div class="progress-track" role="img" aria-label="Наблюдаемые ответы: 398 / 398 · 100,0%"><div class="progress-fill" style="width:100.00000%"></div></div>
+        <div class="progress-sub">База для лестницы прогресса</div>
+      </div>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Подтвержденная запись в чате</strong><span>57 / 398 · 14,3%</span></div>
+        <div class="progress-track" role="img" aria-label="Подтвержденная запись в чате: 57 / 398 · 14,3%"><div class="progress-fill" style="width:14.32161%"></div></div>
+        <div class="progress-sub">14,3% от касаний с ответом</div>
+      </div>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Высокий интерес без подтвержденной записи</strong><span>41 / 398 · 10,3%</span></div>
+        <div class="progress-track" role="img" aria-label="Высокий интерес без подтвержденной записи: 41 / 398 · 10,3%"><div class="progress-fill" style="width:10.30151%"></div></div>
+        <div class="progress-sub">10,3% от касаний с ответом</div>
+      </div>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Нет явного прогресса / нет записи</strong><span>298 / 398 · 74,9%</span></div>
+        <div class="progress-track" role="img" aria-label="Нет явного прогресса / нет записи: 298 / 398 · 74,9%"><div class="progress-fill" style="width:74.87437%"></div></div>
+        <div class="progress-sub">74,9% от касаний с ответом</div>
+      </div>
+          
+      <div class="progress-row">
+        <div class="progress-meta"><strong>Неясный этап записи</strong><span>2 / 398 · только количество</span></div>
+        <div class="progress-track" role="img" aria-label="Неясный этап записи: 2 / 398 · только количество"><div class="progress-fill" style="width:0.50251%"></div></div>
+        <div class="progress-sub">только количество</div>
+      </div>
+        </div>
+        <div>
+          <h3>Этапы высокого интереса без подтвержденной записи</h3>
+          <div class="table-wrap"><table class="metric-table compact"><thead><tr><th>Этап</th><th>Касания</th><th>Правило</th></tr></thead><tbody>
+            <tr><td>Менеджер предложил слот</td><td>15</td><td><span class="small-only">только количество</span></td></tr>
+            <tr><td>Клиент запросил консультацию</td><td>11</td><td><span class="small-only">только количество</span></td></tr>
+            <tr><td>Вероятная запись вне чата</td><td>7</td><td><span class="small-only">только количество</span></td></tr>
+            <tr><td>Запросили контакты</td><td>4</td><td><span class="small-only">только количество</span></td></tr>
+            <tr><td>Контакты отправлены</td><td>2</td><td><span class="small-only">только количество</span></td></tr>
+            <tr><td>Клиент запросил слот</td><td>1</td><td><span class="small-only">только количество</span></td></tr>
+            <tr><td>Клиент выбрал слот</td><td>1</td><td><span class="small-only">только количество</span></td></tr>
+          </tbody></table></div>
+          <div class="callout">Любой прогресс = 98 касаний = 57 подтвержденных записей + 41 случай высокого интереса без строгого подтверждения. Это не дополнительный прирост и не двойной счет.</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="trend" class="panel">
+      <div class="section-title">
+        <div><span class="view-badge">Срез по касаниям</span><h2>Динамика по месяцам</h2><p>Только операционный тренд. Ранние месяцы с малой базой показаны только количеством.</p></div>
+        <span class="denom">Знаменатель: n месяца</span>
+      </div>
+      
+      <div class="stack-row month-row">
+        <div class="stack-label"><strong>2025-12</strong><span>n=1 · только количество</span></div>
+        <div class="stacked"><div class="seg notread" style="width:0.00000%" title="Не прочитано: 0 / 1 · только количество"><span>Не прочитано: 0</span></div><div class="seg readnoreply" style="width:0.00000%" title="Прочитано, ответа нет: 0 / 1 · только количество"><span>Прочитано, ответа нет: 0</span></div><div class="seg replynobook" style="width:100.00000%" title="Ответил, записи нет: 1 / 1 · только количество"><span>Ответил, записи нет: 1</span></div><div class="seg booking" style="width:0.00000%" title="Запись: 0 / 1 · только количество"><span>Запись: 0</span></div><div class="seg unclear" style="width:0.00000%" title="Неясно: 0 / 1 · только количество"><span>Неясно: 0</span></div></div>
+      </div>
+
+      <div class="stack-row month-row">
+        <div class="stack-label"><strong>2026-01</strong><span>n=10 · только количество</span></div>
+        <div class="stacked"><div class="seg notread" style="width:0.00000%" title="Не прочитано: 0 / 10 · только количество"><span>Не прочитано: 0</span></div><div class="seg readnoreply" style="width:50.00000%" title="Прочитано, ответа нет: 5 / 10 · только количество"><span>Прочитано, ответа нет: 5</span></div><div class="seg replynobook" style="width:40.00000%" title="Ответил, записи нет: 4 / 10 · только количество"><span>Ответил, записи нет: 4</span></div><div class="seg booking" style="width:10.00000%" title="Запись: 1 / 10 · только количество"><span>Запись: 1</span></div><div class="seg unclear" style="width:0.00000%" title="Неясно: 0 / 10 · только количество"><span>Неясно: 0</span></div></div>
+      </div>
+
+      <div class="stack-row month-row">
+        <div class="stack-label"><strong>2026-02</strong><span>n=30 · знаменатель: строка n</span></div>
+        <div class="stacked"><div class="seg notread" style="width:0.00000%" title="Не прочитано: 0 / 30 (0,0%)"><span>Не прочитано: 0</span></div><div class="seg readnoreply" style="width:36.66667%" title="Прочитано, ответа нет: 11 / 30 (36,7%)"><span>Прочитано, ответа нет: 36,7%</span></div><div class="seg replynobook" style="width:56.66667%" title="Ответил, записи нет: 17 / 30 (56,7%)"><span>Ответил, записи нет: 56,7%</span></div><div class="seg booking" style="width:6.66667%" title="Запись: 2 / 30 (6,7%)"><span>Запись: 2</span></div><div class="seg unclear" style="width:0.00000%" title="Неясно: 0 / 30 (0,0%)"><span>Неясно: 0</span></div></div>
+      </div>
+
+      <div class="stack-row month-row">
+        <div class="stack-label"><strong>2026-03</strong><span>n=103 · знаменатель: строка n</span></div>
+        <div class="stacked"><div class="seg notread" style="width:0.00000%" title="Не прочитано: 0 / 103 (0,0%)"><span>Не прочитано: 0</span></div><div class="seg readnoreply" style="width:45.63107%" title="Прочитано, ответа нет: 47 / 103 (45,6%)"><span>Прочитано, ответа нет: 45,6%</span></div><div class="seg replynobook" style="width:46.60194%" title="Ответил, записи нет: 48 / 103 (46,6%)"><span>Ответил, записи нет: 46,6%</span></div><div class="seg booking" style="width:7.76699%" title="Запись: 8 / 103 (7,8%)"><span>Запись: 7,8%</span></div><div class="seg unclear" style="width:0.00000%" title="Неясно: 0 / 103 (0,0%)"><span>Неясно: 0</span></div></div>
+      </div>
+
+      <div class="stack-row month-row">
+        <div class="stack-label"><strong>2026-04</strong><span>n=147 · знаменатель: строка n</span></div>
+        <div class="stacked"><div class="seg notread" style="width:2.04082%" title="Не прочитано: 3 / 147 (2,0%)"><span>Не прочитано: 3</span></div><div class="seg readnoreply" style="width:55.10204%" title="Прочитано, ответа нет: 81 / 147 (55,1%)"><span>Прочитано, ответа нет: 55,1%</span></div><div class="seg replynobook" style="width:36.05442%" title="Ответил, записи нет: 53 / 147 (36,1%)"><span>Ответил, записи нет: 36,1%</span></div><div class="seg booking" style="width:6.80272%" title="Запись: 10 / 147 (6,8%)"><span>Запись: 10</span></div><div class="seg unclear" style="width:0.00000%" title="Неясно: 0 / 147 (0,0%)"><span>Неясно: 0</span></div></div>
+      </div>
+
+      <div class="stack-row month-row">
+        <div class="stack-label"><strong>2026-05</strong><span>n=362 · знаменатель: строка n</span></div>
+        <div class="stacked"><div class="seg notread" style="width:4.41989%" title="Не прочитано: 16 / 362 (4,4%)"><span>Не прочитано: 16</span></div><div class="seg readnoreply" style="width:53.59116%" title="Прочитано, ответа нет: 194 / 362 (53,6%)"><span>Прочитано, ответа нет: 53,6%</span></div><div class="seg replynobook" style="width:36.18785%" title="Ответил, записи нет: 131 / 362 (36,2%)"><span>Ответил, записи нет: 36,2%</span></div><div class="seg booking" style="width:5.52486%" title="Запись: 20 / 362 (5,5%)"><span>Запись: 20</span></div><div class="seg unclear" style="width:0.27624%" title="Неясно: 1 / 362 (0,3%)"><span>Неясно: 1</span></div></div>
+      </div>
+
+      <div class="stack-row month-row">
+        <div class="stack-label"><strong>2026-06</strong><span>n=216 · знаменатель: строка n</span></div>
+        <div class="stacked"><div class="seg notread" style="width:7.87037%" title="Не прочитано: 17 / 216 (7,9%)"><span>Не прочитано: 7,9%</span></div><div class="seg readnoreply" style="width:44.90741%" title="Прочитано, ответа нет: 97 / 216 (44,9%)"><span>Прочитано, ответа нет: 44,9%</span></div><div class="seg replynobook" style="width:39.81481%" title="Ответил, записи нет: 86 / 216 (39,8%)"><span>Ответил, записи нет: 39,8%</span></div><div class="seg booking" style="width:7.40741%" title="Запись: 16 / 216 (7,4%)"><span>Запись: 7,4%</span></div><div class="seg unclear" style="width:0.00000%" title="Неясно: 0 / 216 (0,0%)"><span>Неясно: 0</span></div></div>
+      </div>
+      <div class="legend"><span><i class="notread"></i>Не прочитано / нет подтвержденного контакта</span><span><i class="readnoreply"></i>Прочитано, ответа нет</span><span><i class="replynobook"></i>Ответил, записи нет</span><span><i class="booking"></i>Подтвержденная запись в чате</span><span><i class="unclear"></i>Неясно</span></div>
+      <div class="source-note">Изменения по месяцам нельзя интерпретировать как причинное влияние скрипта до Этапа 2. Март–июнь имеют наиболее стабильный объем; декабрь и январь — только количество.</div>
+    </section>
+
+    <section id="pass2" class="panel">
+      <div class="section-title">
+        <div><h2>План Этапа 2</h2><p>Этап 1 показывает, где ломается воронка. Этап 2 читает переписки, объясняет причины и превращает паттерны в дерево скриптов и операционные рекомендации.</p></div>
+        <span class="denom">Приоритетная очередь разбора</span>
+      </div>
+      <div class="roadmap">
+        <div class="roadmap-item"><div class="roadmap-priority">1</div><div><strong>Высокий интерес без подтвержденной записи</strong><p>41 касание · горячие лиды с прогрессом, но без строгого подтверждения записи в чате</p></div></div>
+        <div class="roadmap-item"><div class="roadmap-priority">2</div><div><strong>Паттерны успешных подтвержденных записей</strong><p>57 касаний · позитивная база для дерева скриптов и механики закрытия на запись</p></div></div>
+        <div class="roadmap-item"><div class="roadmap-priority">3</div><div><strong>Ответил, но подтвержденной записи нет</strong><p>340 касаний · основная таксономия причин потерь среди ответивших</p></div></div>
+        <div class="roadmap-item"><div class="roadmap-priority">4</div><div><strong>Вопрос продолжил диалог, но записи нет</strong><p>249 касаний · где уточняющий вопрос вовлек клиента, но не довел до записи</p></div></div>
+        <div class="roadmap-item"><div class="roadmap-priority">5</div><div><strong>Прямое предложение записи: ответ есть, записи нет</strong><p>43 касания · клиент вступил в диалог после прямого предложения, но не записался</p></div></div>
+        <div class="roadmap-item"><div class="roadmap-priority">6</div><div><strong>Возврат после молчания</strong><p>35 касаний · вопросы и добивки, после которых молчавшие клиенты вернулись</p></div></div>
+        <div class="roadmap-item"><div class="roadmap-priority">7</div><div><strong>Прочитано, ответа нет: скрипт и ритм добивок</strong><p>435 касаний · сегментация «прочитано, ответа нет», причины из текста клиента здесь выводить нельзя</p></div></div>
+        <div class="roadmap-item"><div class="roadmap-priority">8</div><div><strong>Наложение: возможная ошибка менеджера или скрипта</strong><p>258 касаний · дополнительный тег для проверки обработки диалога</p></div></div>
+        <div class="roadmap-item"><div class="roadmap-priority">9</div><div><strong>Наложение: возражение клиента / фактор вне скрипта</strong><p>272 касания · дополнительный тег для явных возражений и факторов вне скрипта</p></div></div>
+      </div>
+      <div class="callout" style="margin-top:18px;">Рекомендуемый фокус Этапа 2: возврат молчащих клиентов + доведение заинтересованных клиентов до записи. Сначала стоит читать высокий интерес без подтверждения и успешные записи, а уже потом формировать финальные скриптовые рекомендации.</div>
+    </section>
+
+    <div class="footer">
+      Клиентская версия: только агрегированные данные; без исходных переписок, внутренних путей, строчных идентификаторов, аудит-индекса и внутренних файлов. Основа — агрегация v1.1.
+    </div>
+  </main>
+</div>
+</body>
+</html>
