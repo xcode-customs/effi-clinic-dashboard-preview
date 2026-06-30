@@ -423,13 +423,12 @@ td.num { white-space: nowrap; }
   vertical-align: middle;
 }
 .help::after {
-  content: attr(data-tip);
-  position: absolute;
-  left: 50%;
-  bottom: calc(100% + 10px);
-  z-index: 200;
-  width: min(310px, 78vw);
-  transform: translateX(-50%) translateY(4px);
+  display: none;
+}
+.floating-tooltip {
+  position: fixed;
+  z-index: 2147483647;
+  width: min(330px, calc(100vw - 28px));
   padding: 10px 12px;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -443,14 +442,14 @@ td.num { white-space: nowrap; }
   text-transform: none;
   letter-spacing: 0;
   white-space: normal;
-  opacity: 0;
   pointer-events: none;
+  opacity: 0;
+  transform: translateY(4px);
   transition: opacity .15s ease, transform .15s ease;
 }
-.help:hover::after,
-.help:focus::after {
+.floating-tooltip.visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
 }
 details.details-table {
   margin-top: 18px;
@@ -1017,5 +1016,80 @@ document.addEventListener('DOMContentLoaded', function() {
     </p>
 </main>
 </div>
+<script>
+(() => {
+  const helpItems = Array.from(document.querySelectorAll(".help[data-tip]"));
+  if (!helpItems.length) return;
+
+  const tooltip = document.createElement("div");
+  tooltip.className = "floating-tooltip";
+  tooltip.setAttribute("role", "tooltip");
+  document.body.appendChild(tooltip);
+
+  let activeItem = null;
+
+  function placeTooltip(target) {
+    const margin = 14;
+    const gap = 10;
+    const targetRect = target.getBoundingClientRect();
+    const tipRect = tooltip.getBoundingClientRect();
+    let left = targetRect.left + targetRect.width / 2 - tipRect.width / 2;
+    left = Math.max(margin, Math.min(window.innerWidth - tipRect.width - margin, left));
+
+    let top = targetRect.top - tipRect.height - gap;
+    if (top < margin) {
+      top = targetRect.bottom + gap;
+    }
+    top = Math.max(margin, Math.min(window.innerHeight - tipRect.height - margin, top));
+
+    tooltip.style.left = `${left}px`;
+    tooltip.style.top = `${top}px`;
+  }
+
+  function showTooltip(target) {
+    const text = target.getAttribute("data-tip");
+    if (!text) return;
+    activeItem = target;
+    tooltip.textContent = text;
+    tooltip.style.visibility = "hidden";
+    tooltip.classList.add("visible");
+    requestAnimationFrame(() => {
+      if (activeItem !== target) return;
+      placeTooltip(target);
+      tooltip.style.visibility = "visible";
+    });
+  }
+
+  function hideTooltip() {
+    activeItem = null;
+    tooltip.classList.remove("visible");
+    tooltip.style.visibility = "hidden";
+  }
+
+  helpItems.forEach((item) => {
+    item.addEventListener("mouseenter", () => showTooltip(item));
+    item.addEventListener("focus", () => showTooltip(item));
+    item.addEventListener("mouseleave", hideTooltip);
+    item.addEventListener("blur", hideTooltip);
+    item.addEventListener("click", (event) => {
+      event.preventDefault();
+      event.stopPropagation();
+      if (activeItem === item && tooltip.classList.contains("visible")) {
+        hideTooltip();
+      } else {
+        showTooltip(item);
+      }
+    });
+  });
+
+  document.addEventListener("click", hideTooltip);
+  window.addEventListener("resize", () => {
+    if (activeItem) placeTooltip(activeItem);
+  });
+  window.addEventListener("scroll", () => {
+    if (activeItem) placeTooltip(activeItem);
+  }, true);
+})();
+</script>
 </body>
 </html>
